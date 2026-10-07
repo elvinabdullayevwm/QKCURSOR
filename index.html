@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Qala Kursu (by London)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header" id="top">
+    <div class="header-inner">
+      <a class="brand" href="#hero">
+        <span class="brand-mark">Q</span>
+        <span class="brand-text">
+          <strong>Qala Kursu</strong>
+          <small>(by London)</small>
+        </span>
+      </a>
+
+      <nav class="main-nav" id="mainNav">
+        <a href="#hero">Ana səhifə</a>
+        <a href="#services">Xidmətlər</a>
+        <a href="#news">Xəbərlər</a>
+        <a href="#achievements">Nailiyyətlər</a>
+        <a href="#about">Haqqımızda</a>
+        <a href="#register">Qeydiyyat</a>
+        <a href="#contact">Əlaqə</a>
+        <a href="#address">Ünvan</a>
+      </nav>
+
+      <div class="header-actions">
+        <div class="login-wrap" id="loginWrap">
+          <button type="button" class="btn btn-gold" id="girisBtn" aria-expanded="false">Giriş</button>
+          <div class="login-panel" id="loginPanel" hidden>
+            <button type="button" class="login-choice" data-role="valideyn">Valideyn girişi</button>
+            <button type="button" class="login-choice" data-role="muellim">Müəllim girişi</button>
+          </div>
+        </div>
+        <div class="user-chip" id="userChip" hidden>
+          <span id="userChipName"></span>
+          <button type="button" class="btn btn-ghost" id="logoutBtn">Çıxış</button>
+        </div>
+        <button type="button" class="nav-toggle" id="navToggle" aria-label="Menyu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <div id="publicSite">
+    <section class="hero" id="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Gəncə Qalası · Təhsil qalası</p>
+        <h1>Gələcəyin qalasını bu gündən qur.</h1>
+        <p class="lead">Abituriyentdən süni intellektə qədər — Qala Kursu (by London) övladınızı həm imtahana, həm həyata hazırlayır.</p>
+        <a class="btn btn-gold" href="#register">Qeydiyyata başla</a>
+      </div>
+      <div class="headline-stage" aria-live="polite">
+        <p class="headline-kicker">Manşet xəbərlər</p>
+        <div class="headline-card" id="headlineCard">
+          <span class="headline-tag" id="headlineTag"></span>
+          <h2 id="headlineTitle"></h2>
+          <p id="headlineText"></p>
+        </div>
+        <div class="headline-dots" id="headlineDots"></div>
+      </div>
+    </section>
+
+    <section class="section" id="services">
+      <div class="section-head">
+        <h2>Xidmətlər</h2>
+        <p>Hər istiqamət üzrə aylıq təhsil haqqı və proqramlar.</p>
+      </div>
+      <div class="service-grid">
+        <article class="card"><h3>Abituriyent hazırlığı</h3><p>8–11-ci siniflər üzrə</p><strong>300 AZN</strong></article>
+        <article class="card"><h3>Təkmilləşmə hazırlığı</h3><p>5–7-ci siniflər üzrə</p><strong>150 AZN</strong></article>
+        <article class="card"><h3>İbtidai hazırlıq</h3><p>1–4-cü siniflər üzrə</p><strong>120 AZN</strong></article>
+        <article class="card"><h3>Speaking (danışıq) dərsləri</h3><p>İngilis, Rus, Alman, Fransız, Çin</p><strong>100 AZN</strong></article>
+        <article class="card"><h3>Kompüter dərsləri</h3><p>Ofis proqramları və rəqəmsal savad</p><strong>100 AZN</strong></article>
+        <article class="card"><h3>Süni intellekt dərsləri</h3><p>AI alətləri və praktiki tətbiq</p><strong>250 AZN</strong></article>
+        <article class="card"><h3>Kibertəhlükəsizlik dərsləri</h3><p>İnformasiya təhlükəsizliyinin əsasları</p><strong>400 AZN</strong></article>
+        <article class="card"><h3>Proqramlaşdırma dərsləri</h3><p>Kodlaşdırma və məntiqi düşüncə</p><strong>200 AZN</strong></article>
+        <article class="card"><h3>Robototexnika dərsləri</h3><p>Konstruktor, sensor və mexanika</p><strong>150 AZN</strong></article>
+        <article class="card"><h3>Rəsm dərsləri</h3><p>Yaradıcılıq və kompozisiya</p><strong>80 AZN</strong></article>
+        <article class="card card-wide"><h3>Sınaq imtahanları</h3><p>OTK.az və MQM-in təşkilatçılığı ilə mütəmadi sınaqlar</p></article>
+      </div>
+    </section>
+
+    <section class="section alt" id="news">
+      <div class="section-head">
+        <h2>Xəbərlər</h2>
+        <p>Kurs həyatından qısa xəbərlər — sonra birlikdə genişləndirərik.</p>
+      </div>
+      <div class="news-grid" id="newsGrid"></div>
+    </section>
+
+    <section class="section" id="achievements">
+      <div class="section-head">
+        <h2>Nailiyyətlər</h2>
+        <p>Nəticə danışır. Qalanı şagirdlərimiz yazır.</p>
+      </div>
+      <div class="stat-grid">
+        <article class="stat"><b>9</b><span>nəfər 700 bal</span></article>
+        <article class="stat"><b>15+</b><span>600+ bal</span></article>
+        <article class="stat"><b>35+</b><span>500+ bal</span></article>
+        <article class="stat"><b>47</b><span>olimpiada uğuru</span></article>
+        <article class="stat"><b>100+</b><span>liseylərə qəbul</span></article>
+        <article class="stat"><b>2Q · 4G · 7B</b><span>Beynəlxalq İT yarışları</span></article>
+      </div>
+    </section>
+
+    <section class="section about" id="about">
+      <div class="about-panel">
+        <h2>Haqqımızda</h2>
+        <p>Gəl. Qapını aç, içəri keç — Qala səni gözləyir.</p>
+        <p>Biz sadəcə dərs deyən yer deyilik. <strong>Qala Kursu (by London)</strong> Gəncədə o ocaqdır ki, şagird bura “imtahana hazırlaşım” deyə gəlir, “mən bacarıram” deyə çıxır. Abituriyent stolunun arxasında 700-lük hədəf, kiçik sinifdə hərflərin sehri, İT otağında isə süni intellektin dili eyni qala divarının içində yaşayır.</p>
+        <p>Gəl, övladının potensialını təsadüfə buraxma. Gəl, sınaqda özünü ölç, olimpiadada adını yazdır, lisey qapısını inamla döy. Müəllimlərimiz saatı doldurmur — şagirdi qaldırır. Valideyn isə burada tək qalmır: davamiyyət, ev tapşırığı, nəticə — hamısı şəffafdır.</p>
+        <p>Gəl gəl. Yer məhduddur, amma hədəf böyükdür. Bu qalanın içində sənin də nəticən görünəcək.</p>
+      </div>
+    </section>
+
+    <section class="section alt" id="register">
+      <div class="section-head">
+        <h2>Qeydiyyat</h2>
+        <p>Məlumatı göndərin — eyni anda Google Sheet-dəki «Müraciətlər» vərəqinə düşür.</p>
+      </div>
+      <form class="form-card" id="registerForm">
+        <label>Ad Soyad
+          <input name="adSoyad" type="text" required placeholder="Şagirdin adı və soyadı">
+        </label>
+        <label>Sinif
+          <select name="sinif" required>
+            <option value="">Sinif seçin</option>
+            <option>1</option><option>2</option><option>3</option><option>4</option>
+            <option>5</option><option>6</option><option>7</option><option>8</option>
+            <option>9</option><option>10</option><option>11</option>
+          </select>
+        </label>
+        <label>Bölmə
+          <select name="bolme" required>
+            <option value="">Bölmə seçin</option>
+            <option>Azərbaycan</option>
+            <option>Rus</option>
+            <option>A</option>
+            <option>B</option>
+          </select>
+        </label>
+        <label>Xidmət
+          <select name="xidmet" required>
+            <option value="">Xidmət seçin</option>
+            <option>Abituriyent hazırlığı (8-11 ci siniflər üzrə)</option>
+            <option>Təkmilləşmə hazırlığı (5-7 ci siniflər üzrə)</option>
+            <option>İbtidai hazırlıq (1-4 cü siniflər üzrə)</option>
+            <option>Speaking (danışıq) dərsləri</option>
+            <option>Kompüter dərsləri</option>
+            <option>Süni intellekt dərsləri</option>
+            <option>Kibertəhlükəsizlik dərsləri</option>
+            <option>Proqramlaşdırma dərsləri</option>
+            <option>Robototexnika dərsləri</option>
+            <option>Rəsm dərsləri</option>
+            <option>Sınaq imtahanları (OTK.az və MQM)</option>
+          </select>
+        </label>
+        <label>Əlaqə (telefon)
+          <input name="telefon" type="tel" required placeholder="055 XXX XX XX">
+        </label>
+        <button type="submit" class="btn btn-gold" id="registerBtn">Qeydiyyat</button>
+        <p class="form-msg" id="registerMsg" hidden></p>
+      </form>
+    </section>
+
+    <section class="section" id="contact">
+      <div class="section-head">
+        <h2>Əlaqə</h2>
+      </div>
+      <div class="contact-grid">
+        <article class="card">
+          <h3>Telefon</h3>
+          <a href="tel:0559232777">055 923 27 77</a>
+          <a href="tel:0559812777">055 981 27 77</a>
+          <a href="tel:0559092777">055 909 27 77</a>
+          <a href="tel:0559342777">055 934 27 77</a>
+          <a href="tel:0559162777">055 916 27 77</a>
+        </article>
+        <article class="card">
+          <h3>Sosial media</h3>
+          <p>Instagram: <a href="https://instagram.com/QalaKursu" target="_blank" rel="noopener">QalaKursu</a></p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section alt" id="address">
+      <div class="section-head">
+        <h2>Ünvan</h2>
+      </div>
+      <article class="card address-card">
+        <p>Gəncə şəhəri, Gəncə Qalası Ticarət Mərkəzi (Əttarlar 32)</p>
+        <a class="btn btn-outline" href="https://maps.google.com/?q=Gəncə Qalası Ticarət Mərkəzi Əttarlar 32" target="_blank" rel="noopener">Xəritədə aç</a>
+      </article>
+    </section>
+
+    <footer class="site-footer">
+      <p>© <span id="year"></span> Qala Kursu (by London) · Gəncə</p>
+    </footer>
+  </div>
+
+  <main class="app-shell" id="teacherApp" hidden>
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>Müəllim paneli</h2>
+          <p id="teacherMeta"></p>
+        </div>
+        <label class="inline-label">Cədvəl
+          <select id="gunTipiSelect">
+            <option value="auto">Bu gün (avtomatik)</option>
+            <option value="Tək">Tək günlər</option>
+            <option value="Cüt">Cüt günlər</option>
+          </select>
+        </label>
+      </div>
+      <p class="hint">öz saatınıza uyğun dərsə toxunun — həmin saatın 10 şagirdi açılacaq.</p>
+      <div id="scheduleList" class="schedule-list"></div>
+    </section>
+  </main>
+
+  <main class="app-shell" id="lessonApp" hidden>
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h2 id="lessonTitle">Dərs</h2>
+          <p id="lessonMeta"></p>
+        </div>
+        <button type="button" class="btn btn-ghost" id="backDashBtn">Cədvələ qayıt</button>
+      </div>
+
+      <div class="step" id="step1">
+        <h3>Davamiyyət</h3>
+        <div id="attList" class="student-rows"></div>
+        <button type="button" class="btn btn-gold" data-complete="1">Tamamla</button>
+      </div>
+
+      <div class="step" id="step2" hidden>
+        <h3>Ev tapşırığı / test statistikası</h3>
+        <label>Mövzu
+          <input id="statMovzu" type="text" placeholder="Bu dərsin mövzusu">
+        </label>
+        <div id="statList" class="student-rows"></div>
+        <button type="button" class="btn btn-gold" data-complete="2">Tamamla</button>
+      </div>
+
+      <div class="step" id="step3" hidden>
+        <h3>Emosional durum və aktivlik</h3>
+        <label>Mövzu
+          <input id="actMovzu" type="text" placeholder="Sual-cavab / mövzu">
+        </label>
+        <div id="actList" class="student-rows"></div>
+        <button type="button" class="btn btn-gold" data-complete="3">Tamamla</button>
+      </div>
+
+      <div class="step" id="step4" hidden>
+        <h3>Əlavə yoxlama</h3>
+        <button type="button" class="btn btn-outline" id="extraToggle">Əlavə yoxlama</button>
+        <div id="extraBox" hidden>
+          <label>Növ
+            <select id="elaveNovu">
+              <option value="">Seçin</option>
+              <option>1 diaqnostik</option>
+              <option>Ümumi sınaq</option>
+              <option>OTK</option>
+              <option>DIM</option>
+            </select>
+          </label>
+          <label>Mövzu
+            <input id="elaveMovzu" type="text" placeholder="Yoxlama mövzusu">
+          </label>
+          <div id="extraList" class="student-rows"></div>
+        </div>
+        <div class="row-actions">
+          <button type="button" class="btn btn-outline" data-complete="4" data-skip="1">Keç</button>
+          <button type="button" class="btn btn-gold" data-complete="4">Tamamla</button>
+        </div>
+      </div>
+
+      <div class="step" id="step5" hidden>
+        <h3>Ev tapşırığı və qeyd</h3>
+        <div id="hwList" class="student-rows"></div>
+        <button type="button" class="btn btn-gold" data-complete="5">Tamamla</button>
+      </div>
+
+      <div class="step" id="step6" hidden>
+        <h3>Dərs yekunlaşdı</h3>
+        <p>Bütün məlumatlar Sheet-ə yazıldı.</p>
+        <button type="button" class="btn btn-gold" id="finishBtn">Dərsi bitir</button>
+      </div>
+    </section>
+  </main>
+
+  <main class="app-shell" id="parentApp" hidden>
+    <section class="panel">
+      <h2>Valideyn paneli</h2>
+      <p id="parentMeta"></p>
+      <div id="parentResults"></div>
+    </section>
+  </main>
+
+  <div class="modal" id="authModal" hidden>
+    <div class="modal-card">
+      <button type="button" class="modal-close" id="authClose" aria-label="Bağla">×</button>
+      <h3 id="authTitle">Giriş</h3>
+      <form id="authForm">
+        <label id="loginLabel">Login
+          <input id="authLogin" type="text" autocomplete="username" required>
+        </label>
+        <label>Parol / kod
+          <input id="authParol" type="password" autocomplete="current-password" required>
+        </label>
+        <p class="hint" id="authHint"></p>
+        <button type="submit" class="btn btn-gold" id="authSubmit">Daxil ol</button>
+        <p class="form-msg" id="authMsg" hidden></p>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+  <script src="script.js"></script>
+</body>
+</html>
