@@ -232,13 +232,16 @@
           <h2 id="lessonTitle">Dərs</h2>
           <p id="lessonMeta"></p>
         </div>
-        <button type="button" class="btn btn-ghost" id="backDashBtn">Cədvələ qayıt</button>
+        <button type="button" class="btn btn-ghost" id="backDashBtn">← Cədvələ qayıt</button>
       </div>
 
       <div class="step" id="step1">
         <h3>Davamiyyət</h3>
         <div id="attList" class="student-rows"></div>
-        <button type="button" class="btn btn-gold" data-complete="1">Tamamla</button>
+        <div class="row-actions">
+          <button type="button" class="btn btn-outline" id="backToDashFromStep1">← Cədvələ qayıt</button>
+          <button type="button" class="btn btn-gold" data-complete="1">Tamamla</button>
+        </div>
       </div>
 
       <div class="step" id="step2" hidden>
@@ -247,7 +250,7 @@
           <input id="statMovzu" type="text" placeholder="Bu dərsin mövzusu">
         </label>
         <div id="statList" class="student-rows"></div>
-        <button type="button" class="btn btn-gold" data-complete="2">Tamamla</button>
+        <div class="row-actions"><button type="button" class="btn btn-outline" data-prev-step="1">← Geri</button><button type="button" class="btn btn-gold" data-complete="2">Tamamla</button></div>
       </div>
 
       <div class="step" id="step3" hidden>
@@ -256,7 +259,7 @@
           <input id="actMovzu" type="text" placeholder="Sual-cavab / mövzu">
         </label>
         <div id="actList" class="student-rows"></div>
-        <button type="button" class="btn btn-gold" data-complete="3">Tamamla</button>
+        <div class="row-actions"><button type="button" class="btn btn-outline" data-prev-step="2">← Geri</button><button type="button" class="btn btn-gold" data-complete="3">Tamamla</button></div>
       </div>
 
       <div class="step" id="step4" hidden>
@@ -278,6 +281,7 @@
           <div id="extraList" class="student-rows"></div>
         </div>
         <div class="row-actions">
+          <button type="button" class="btn btn-outline" data-prev-step="3">← Geri</button>
           <button type="button" class="btn btn-outline" data-complete="4" data-skip="1">Keç</button>
           <button type="button" class="btn btn-gold" data-complete="4">Tamamla</button>
         </div>
@@ -286,13 +290,13 @@
       <div class="step" id="step5" hidden>
         <h3>Ev tapşırığı və qeyd</h3>
         <div id="hwList" class="student-rows"></div>
-        <button type="button" class="btn btn-gold" data-complete="5">Tamamla</button>
+        <div class="row-actions"><button type="button" class="btn btn-outline" data-prev-step="4">← Geri</button><button type="button" class="btn btn-gold" data-complete="5">Tamamla</button></div>
       </div>
 
       <div class="step" id="step6" hidden>
         <h3>Dərs yekunlaşdı</h3>
         <p>Bütün məlumatlar Sheet-ə yazıldı.</p>
-        <button type="button" class="btn btn-gold" id="finishBtn">Dərsi bitir</button>
+        <div class="row-actions"><button type="button" class="btn btn-outline" data-prev-step="5">← Geri</button><button type="button" class="btn btn-gold" id="finishBtn">Dərsi bitir</button></div>
       </div>
     </section>
   </main>
