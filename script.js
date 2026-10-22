@@ -1,4 +1,4 @@
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyG2443BRvam5fpx_2sfo4sJ7XHB2SskdDi9rcy9brf2NrgWE6GZhOcR1wCtoVyti0nfQ/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx-Z7KJNSFFeZwvqMVKPinYGTDqOWxtPI-VHqPr6JGbwDUcQv1MQ/exec";
 
 const NEWS = [
   {
@@ -41,7 +41,8 @@ const state = {
   lesson: null,
   students: [],
   step: 1,
-  extraOpen: false
+  extraOpen: false,
+  dersId: null
 };
 
 function $(id) { return document.getElementById(id); }
@@ -70,17 +71,112 @@ function showMsg(el, text, ok) {
   el.className = "form-msg " + (ok ? "ok" : "err");
 }
 
+const SESSION_KEY = "qalaKursuSessionV2";
+let restoringSession = false;
+
+async function readApiResponse(res) {
+  const raw = await res.text();
+  try {
+    const data = JSON.parse(raw);
+    if (!res.ok && data.status === "success") throw new Error(`Server xətası: ${res.status}`);
+    return data;
+  } catch (err) {
+    if (err instanceof SyntaxError) {
+      throw new Error("Google Apps Script JSON cavabı qaytarmadı. Web App deployment və giriş icazələrini yoxlayın.");
+    }
+    throw err;
+  }
+}
 async function apiGet(params) {
   const url = `${SCRIPT_URL}?${new URLSearchParams(params)}`;
-  const res = await fetch(url);
-  return res.json();
+  const res = await fetch(url, { method: "GET", cache: "no-store" });
+  return readApiResponse(res);
 }
 async function apiPost(payload) {
   const res = await fetch(SCRIPT_URL, {
     method: "POST",
-    body: JSON.stringify(payload)
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(payload),
+    cache: "no-store"
   });
-  return res.json();
+  return readApiResponse(res);
+}
+
+function saveSession() {
+  if (restoringSession) return;
+  if (!state.teacher && !state.parent) return;
+  const formValues = {};
+  document.querySelectorAll("#lessonApp input, #lessonApp select, #lessonApp textarea").forEach(el => {
+    if (el.id) formValues[el.id] = el.value;
+    else if (el.className) {
+      const i = el.dataset.i;
+      formValues[`${el.className}:${i}`] = el.value;
+    }
+  });
+  const lessonIndex = state.lesson ? state.lessons.findIndex(x => x === state.lesson) : -1;
+  const activeApp = !$('lessonApp').hidden ? "lesson" : (!$('teacherApp').hidden ? "teacher" : (!$('parentApp').hidden ? "parent" : ""));
+  try {
+    localStorage.setItem(SESSION_KEY, JSON.stringify({
+      role: state.teacher ? "muellim" : "valideyn",
+      teacher: state.teacher,
+      parent: state.parent,
+      lessonIndex,
+      step: state.step,
+      activeApp,
+      formValues,
+      gunTipi: $("gunTipiSelect")?.value || "auto",
+      extraOpen: state.extraOpen,
+      dersId: state.dersId
+    }));
+  } catch (err) {
+    console.warn("Sessiya yadda saxlanmadı", err);
+  }
+}
+
+function restoreFormValues(values) {
+  Object.entries(values || {}).forEach(([key, value]) => {
+    let el = key.includes(":") ? document.querySelector(`.${CSS.escape(key.split(":")[0])}[data-i="${CSS.escape(key.split(":")[1])}"]`) : $(key);
+    if (el) el.value = value;
+  });
+}
+
+async function restoreSession() {
+  let saved;
+  try { saved = JSON.parse(localStorage.getItem(SESSION_KEY) || "null"); } catch (_) { saved = null; }
+  if (!saved || (!saved.teacher && !saved.parent)) return;
+  restoringSession = true;
+  try {
+    if (saved.teacher) {
+      state.teacher = saved.teacher;
+      state.role = "muellim";
+      $("publicSite").hidden = true;
+      $("teacherApp").hidden = false;
+      setLoggedIn(`${saved.teacher.ad || ""} ${saved.teacher.soyad || ""}`.trim());
+      $("teacherMeta").textContent = `${saved.teacher.fenn || ""} · ${saved.teacher.sektor || ""}`;
+      if (saved.gunTipi) $("gunTipiSelect").value = saved.gunTipi;
+      await loadSchedule();
+      if (saved.activeApp === "lesson" && saved.lessonIndex >= 0 && state.lessons[saved.lessonIndex]) {
+        state.dersId = saved.dersId || null;
+        startLesson(saved.lessonIndex, true);
+        restoreFormValues(saved.formValues);
+        state.extraOpen = !!saved.extraOpen;
+        $("extraBox").hidden = !state.extraOpen;
+        goStep(Math.min(6, Math.max(1, Number(saved.step) || 1)));
+      }
+    } else if (saved.parent) {
+      state.parent = saved.parent;
+      state.role = "valideyn";
+      $("publicSite").hidden = true;
+      $("parentApp").hidden = false;
+      setLoggedIn(saved.parent.adSoyad || "Valideyn");
+      $("parentMeta").textContent = `${saved.parent.adSoyad} · ${saved.parent.sinif || ""} · ${saved.parent.telefon}`;
+      $("parentResults").innerHTML = renderParent(saved.parent);
+    }
+  } catch (err) {
+    console.error("Sessiya bərpa olunmadı", err);
+  } finally {
+    restoringSession = false;
+  }
 }
 
 function renderNews() {
@@ -166,6 +262,7 @@ async function handleAuth(e) {
       setLoggedIn(`${data.ad} ${data.soyad || ""}`.trim());
       $("teacherMeta").textContent = `${data.fenn || ""} · ${data.sektor || ""}`;
       await loadSchedule();
+      saveSession();
     } else {
       const data = await apiGet({ action: "parentLogin", telefon: login, parol });
       if (data.status !== "success") throw new Error(data.message || "Giriş alınmadı");
@@ -176,6 +273,7 @@ async function handleAuth(e) {
       setLoggedIn(data.adSoyad || "Valideyn");
       $("parentMeta").textContent = `${data.adSoyad} · ${data.sinif || ""} · ${data.telefon}`;
       $("parentResults").innerHTML = renderParent(data);
+      saveSession();
     }
   } catch (err) {
     showMsg($("authMsg"), err.message, false);
@@ -227,7 +325,7 @@ async function loadSchedule() {
       <article class="card schedule-item" data-lesson="${i}">
         <h3>${escapeHtml(d.saat || "Saat yoxdur")}</h3>
         <p>${escapeHtml(d.fenn || t.fenn || "")} · ${escapeHtml(d.sinif || "")} ${escapeHtml(d.bolme || "")}</p>
-        <p>${(d.sagirdler || []).length} şagird (10 sətir)</p>
+        <p>${(d.sagirdler || []).length} şagird</p>
       </article>
     `).join("");
   } catch (err) {
@@ -235,8 +333,19 @@ async function loadSchedule() {
   }
 }
 
-function startLesson(index) {
+function startLesson(index, restoring = false) {
   state.lesson = state.lessons[index];
+  
+  if (!restoring || !state.dersId) {
+    state.dersId = [
+      todaySheetDate(),
+      state.lesson.fenn || state.teacher.fenn || "",
+      state.lesson.sinif || "",
+      state.lesson.bolme || "",
+      state.lesson.saat || ""
+    ].join("|");
+  }
+
   const names = (state.lesson.sagirdler || []).slice(0, 10);
   state.students = names.map(s => typeof s === "string" ? { adSoyad: s, ad: s, soyad: "", ata: "", sinif: state.lesson.sinif || "", bolme: state.lesson.bolme || "" } : {
     adSoyad: s.adSoyad || [s.ad, s.soyad, s.ata].filter(Boolean).join(" "),
@@ -252,6 +361,7 @@ function startLesson(index) {
   $("lessonMeta").textContent = `${state.teacher.ad} · ${state.lesson.fenn || state.teacher.fenn || ""}`;
   renderLessonForms();
   goStep(1);
+  if (!restoring) saveSession();
 }
 
 function renderLessonForms() {
@@ -301,11 +411,12 @@ function renderLessonForms() {
 }
 
 function goStep(n) {
-  state.step = n;
+  state.step = Math.min(6, Math.max(1, Number(n) || 1));
   for (let i = 1; i <= 6; i++) {
     const el = $(`step${i}`);
-    if (el) el.hidden = i !== n;
+    if (el) el.hidden = i !== state.step;
   }
+  saveSession();
 }
 
 function collectStudentsExtra() {
@@ -335,6 +446,7 @@ function lessonPayload(action) {
     fenn: state.lesson.fenn || state.teacher.fenn || "",
     sinif: state.lesson.sinif || "",
     bolme: state.lesson.bolme || "",
+    dersId: state.dersId,
     statMovzu: $("statMovzu").value.trim(),
     actMovzu: $("actMovzu").value.trim(),
     elaveNovu: $("elaveNovu").value,
@@ -344,9 +456,11 @@ function lessonPayload(action) {
 }
 
 async function completeStep(step, skipExtra) {
-  const btn = document.querySelector(`[data-complete="${step}"]:not([data-skip])`) || document.querySelector(`[data-complete="${step}"]`);
+  if (completeStep._busy) return;
+  completeStep._busy = true;
   const buttons = document.querySelectorAll(`[data-complete="${step}"]`);
   buttons.forEach(b => { b.disabled = true; });
+  saveSession();
   try {
     let action = "attendance";
     if (step === 2) action = "statisticsHomework";
@@ -360,9 +474,11 @@ async function completeStep(step, skipExtra) {
     toast("Məlumat Sheet-ə yazıldı.");
     goStep(step + 1);
   } catch (err) {
-    toast(err.message);
+    toast(err.message || "Məlumat yazılmadı. Yenidən cəhd edin.");
   } finally {
     buttons.forEach(b => { b.disabled = false; });
+    completeStep._busy = false;
+    saveSession();
   }
 }
 
@@ -385,7 +501,7 @@ async function handleRegister(e) {
     showMsg($("registerMsg"), "Müraciət «Müraciətlər» vərəqinə yazıldı.", true);
     form.reset();
   } catch (err) {
-    showMsg($("registerMsg"), err.message + " (Google skript URL-ni yeniləyin)", false);
+    showMsg($("registerMsg"), err.message, false);
   } finally {
     $("registerBtn").disabled = false;
   }
@@ -415,6 +531,11 @@ function bind() {
   $("logoutBtn").addEventListener("click", () => {
     state.teacher = null;
     state.parent = null;
+    state.lesson = null;
+    state.lessons = [];
+    state.students = [];
+    state.dersId = null;
+    try { localStorage.removeItem(SESSION_KEY); } catch (_) {}
     hideApps();
   });
   $("navToggle").addEventListener("click", () => $("mainNav").classList.toggle("open"));
@@ -430,19 +551,40 @@ function bind() {
   $("backDashBtn").addEventListener("click", () => {
     $("lessonApp").hidden = true;
     $("teacherApp").hidden = false;
+    saveSession();
+  });
+  $("backToDashFromStep1").addEventListener("click", () => {
+    $("lessonApp").hidden = true;
+    $("teacherApp").hidden = false;
+    saveSession();
   });
   $("extraToggle").addEventListener("click", () => {
     state.extraOpen = !state.extraOpen;
     $("extraBox").hidden = !state.extraOpen;
+    saveSession();
   });
   document.querySelectorAll("[data-complete]").forEach(btn => {
     btn.addEventListener("click", () => completeStep(Number(btn.dataset.complete), btn.dataset.skip === "1"));
   });
+  document.querySelectorAll("[data-prev-step]").forEach(btn => {
+    btn.addEventListener("click", () => goStep(Number(btn.dataset.prevStep)));
+  });
   $("finishBtn").addEventListener("click", () => {
     $("lessonApp").hidden = true;
     $("teacherApp").hidden = false;
+    state.lesson = null;
+    state.students = [];
+    state.dersId = null;
     toast("Dərs bitdi.");
+    saveSession();
     loadSchedule();
+  });
+
+  document.addEventListener("input", e => {
+    if (e.target.closest("#lessonApp")) saveSession();
+  });
+  document.addEventListener("change", e => {
+    if (e.target.closest("#lessonApp")) saveSession();
   });
 
   document.querySelectorAll('.main-nav a, .brand').forEach(a => {
@@ -456,6 +598,7 @@ function bind() {
       window.scrollTo({ top, behavior: "smooth" });
     });
   });
+  restoreSession();
 }
 
 bind();
